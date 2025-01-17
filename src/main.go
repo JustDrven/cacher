@@ -8,6 +8,16 @@ import (
 	"os"
 )
 
+type Data struct {
+	Key   string `json:"key"`
+	Value string `json:value`
+}
+
+type ErrorResponse struct {
+	Error   int    `json:"error"`
+	Message string `json:message`
+}
+
 var SOURCE = "CACHER:"
 var data = make(map[string]string)
 
@@ -16,35 +26,69 @@ func main() {
 	http.HandleFunc("/v1/get", getData)
 	http.HandleFunc("/v1/set", saveData)
 
-	fmt.Println("Starting server")
+	fmt.Println("The server is starting..")
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
 
 func saveData(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
 	if checkAuthorization(r.Header) {
+
 		var key string = r.URL.Query().Get("key")
 		if key == "" {
-			http.Error(w, `{"code": 404, "message": "The key is missing!"}`, http.StatusNotFound)
+			w.WriteHeader(http.StatusNotFound)
+
+			var errorResponse = ErrorResponse{
+				Error:   404,
+				Message: "The key is missing!",
+			}
+			json.NewEncoder(w).Encode(errorResponse)
 			return
 		}
 
 		var value string = r.URL.Query().Get("value")
 		if value == "" {
-			http.Error(w, `{"code": 404, "message": "The value is missing!"}`, http.StatusNotFound)
+			w.WriteHeader(http.StatusNotFound)
+
+			var errorResponse = ErrorResponse{
+				Error:   404,
+				Message: "The value is missing!",
+			}
+			json.NewEncoder(w).Encode(errorResponse)
 			return
 		}
 
-		if os.Getenv(SOURCE+key) != "" {
+		var data = Data{
+			Key:   key,
+			Value: value,
+		}
+
+		if os.Getenv(SOURCE+key) == "" {
 			os.Setenv(SOURCE+key, value)
-			json.NewEncoder(w).Encode(`{"ok": true}`)
+			json.NewEncoder(w).Encode(data)
 			return
 		} else {
-			json.NewEncoder(w).Encode(`{"ok": false}`)
+			w.WriteHeader(http.StatusBadRequest)
+
+			var error = ErrorResponse{
+				Error:   400,
+				Message: "The value already exist!",
+			}
+
+			json.NewEncoder(w).Encode(error)
 			return
 		}
 
 	} else {
-		http.Error(w, `{"code": 401, "message": "Unauthorized!"}`, http.StatusNotFound)
+		w.WriteHeader(http.StatusUnauthorized)
+
+		var error = ErrorResponse{
+			Error:   401,
+			Message: "Unauthorized!",
+		}
+
+		json.NewEncoder(w).Encode(error)
 		return
 	}
 }
@@ -56,16 +100,35 @@ func getData(w http.ResponseWriter, r *http.Request) {
 		var key string = r.URL.Query().Get("key")
 
 		if key != "" && os.Getenv(SOURCE+key) != "" {
+			w.WriteHeader(http.StatusOK)
 			var value string = os.Getenv(SOURCE + key)
 
-			json.NewEncoder(w).Encode("{\"key\":\"" + key + "\",\"value\":\"" + value + "\"}")
+			var data = Data{
+				Key:   key,
+				Value: value,
+			}
+
+			json.NewEncoder(w).Encode(data)
 			return
 		} else {
-			http.Error(w, `{"code": 404, "message": "The key is missing!"}`, http.StatusNotFound)
+			w.WriteHeader(http.StatusNotFound)
+
+			var errorResponse = ErrorResponse{
+				Error:   404,
+				Message: "The key is missing!",
+			}
+			json.NewEncoder(w).Encode(errorResponse)
 			return
 		}
 	} else {
-		http.Error(w, `{"code": 401, "message": "Unauthorized!"}`, http.StatusNotFound)
+		w.WriteHeader(http.StatusUnauthorized)
+
+		var error = ErrorResponse{
+			Error:   401,
+			Message: "Unauthorized!",
+		}
+
+		json.NewEncoder(w).Encode(error)
 		return
 	}
 }
