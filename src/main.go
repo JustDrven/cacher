@@ -10,19 +10,23 @@ import (
 
 type Data struct {
 	Key   string `json:"key"`
-	Value string `json:value`
+	Value string `json:"value"`
+}
+
+type Valid struct {
+	Ok bool `json:"ok"`
 }
 
 type ErrorResponse struct {
 	Error   int    `json:"error"`
-	Message string `json:message`
+	Message string `json:"message"`
 }
 
 var SOURCE = "CACHER:"
 var data = make(map[string]string)
 
 func main() {
-	http.HandleFunc("/v1/list", getData)
+	http.HandleFunc("/v1/valid", isValid)
 	http.HandleFunc("/v1/get", getData)
 	http.HandleFunc("/v1/set", saveData)
 
@@ -35,7 +39,7 @@ func saveData(w http.ResponseWriter, r *http.Request) {
 
 	if checkAuthorization(r.Header) {
 
-		var key string = r.URL.Query().Get("key")
+		var key string = r.Header.Get("key")
 		if key == "" {
 			w.WriteHeader(http.StatusNotFound)
 
@@ -47,7 +51,7 @@ func saveData(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		var value string = r.URL.Query().Get("value")
+		var value string = r.Header.Get("value")
 		if value == "" {
 			w.WriteHeader(http.StatusNotFound)
 
@@ -97,7 +101,7 @@ func getData(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	if checkAuthorization(r.Header) {
-		var key string = r.URL.Query().Get("key")
+		var key string = r.Header.Get("key")
 
 		if key != "" && os.Getenv(SOURCE+key) != "" {
 			w.WriteHeader(http.StatusOK)
@@ -120,6 +124,57 @@ func getData(w http.ResponseWriter, r *http.Request) {
 			json.NewEncoder(w).Encode(errorResponse)
 			return
 		}
+	} else {
+		w.WriteHeader(http.StatusUnauthorized)
+
+		var error = ErrorResponse{
+			Error:   401,
+			Message: "Unauthorized!",
+		}
+
+		json.NewEncoder(w).Encode(error)
+		return
+	}
+}
+
+func isValid(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	if checkAuthorization(r.Header) {
+		var key string = r.Header.Get("key")
+
+		if key == "" {
+			w.WriteHeader(http.StatusNotFound)
+
+			var error = ErrorResponse{
+				Error:   404,
+				Message: "The key is missing!",
+			}
+
+			json.NewEncoder(w).Encode(error)
+			return
+		}
+
+		if os.Getenv(SOURCE+key) != "" {
+			w.WriteHeader(http.StatusOK)
+
+			var valid = Valid{
+				Ok: true,
+			}
+
+			json.NewEncoder(w).Encode(valid)
+			return
+		} else {
+			w.WriteHeader(http.StatusOK)
+
+			var valid = Valid{
+				Ok: false,
+			}
+
+			json.NewEncoder(w).Encode(valid)
+			return
+		}
+
 	} else {
 		w.WriteHeader(http.StatusUnauthorized)
 
