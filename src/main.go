@@ -23,7 +23,6 @@ type ErrorResponse struct {
 }
 
 var SOURCE = "CACHER:"
-var data = make(map[string]string)
 
 func main() {
 	http.HandleFunc("/v1/valid", isValid)
