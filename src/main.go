@@ -28,6 +28,7 @@ func main() {
 	http.HandleFunc("/v1/valid", isValid)
 	http.HandleFunc("/v1/get", getData)
 	http.HandleFunc("/v1/set", saveData)
+	http.HandleFunc("/v1/remove", removeData)
 
 	fmt.Println("The server is starting..")
 	log.Fatal(http.ListenAndServe(":8080", nil))
@@ -101,10 +102,11 @@ func getData(w http.ResponseWriter, r *http.Request) {
 
 	if checkAuthorization(r.Header) {
 		var key string = r.Header.Get("key")
+		var solidKey string = SOURCE + key
 
-		if key != "" && os.Getenv(SOURCE+key) != "" {
+		if key != "" && solidKey != "" {
 			w.WriteHeader(http.StatusOK)
-			var value string = os.Getenv(SOURCE + key)
+			var value string = os.Getenv(solidKey)
 
 			var data = Data{
 				Key:   key,
@@ -174,6 +176,61 @@ func isValid(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+	} else {
+		w.WriteHeader(http.StatusUnauthorized)
+
+		var error = ErrorResponse{
+			Error:   401,
+			Message: "Unauthorized!",
+		}
+
+		json.NewEncoder(w).Encode(error)
+		return
+	}
+}
+
+func removeData(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	if checkAuthorization(r.Header) {
+		var requestKey string = r.Header.Get("key")
+		if requestKey == "" {
+			w.WriteHeader(http.StatusNotFound)
+
+			var error = ErrorResponse{
+				Error:   404,
+				Message: "The key is missing!",
+			}
+
+			json.NewEncoder(w).Encode(error)
+			return
+		} else {
+			var value string = os.Getenv(SOURCE + requestKey)
+
+			if value != "" {
+				w.WriteHeader(http.StatusOK)
+
+				var data = Data{
+					Key:   requestKey,
+					Value: value,
+				}
+
+				os.Unsetenv(SOURCE + requestKey)
+
+				json.NewEncoder(w).Encode(data)
+				return
+			} else {
+				w.WriteHeader(http.StatusNotFound)
+
+				var error = ErrorResponse{
+					Error:   404,
+					Message: "The data doesn't exist!",
+				}
+
+				json.NewEncoder(w).Encode(error)
+				return
+			}
+		}
 	} else {
 		w.WriteHeader(http.StatusUnauthorized)
 
