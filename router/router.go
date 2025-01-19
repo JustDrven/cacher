@@ -1,53 +1,30 @@
-package main
+package router
 
 import (
+	"cacher/data"
+	"cacher/security"
 	"encoding/json"
-	"fmt"
-	"log"
 	"net/http"
 	"os"
 )
 
-type Data struct {
-	Key   string `json:"key"`
-	Value string `json:"value"`
-}
-
-type Valid struct {
-	Ok bool `json:"ok"`
-}
-
-type ErrorResponse struct {
-	Error   int    `json:"error"`
-	Message string `json:"message"`
-}
-
 var SOURCE = "CACHER:"
 
-func main() {
-	http.HandleFunc("/v1/valid", isValid)
-	http.HandleFunc("/v1/get", getData)
-	http.HandleFunc("/v1/set", saveData)
-	http.HandleFunc("/v1/remove", removeData)
-
-	fmt.Println("The server is starting..")
-	log.Fatal(http.ListenAndServe(":8080", nil))
-}
-
-func saveData(w http.ResponseWriter, r *http.Request) {
+func SaveData(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
+	writer := json.NewEncoder(w)
 
-	if checkAuthorization(r.Header) {
+	if security.CheckAuthorization(r.Header) {
 
 		var key string = r.Header.Get("key")
 		if key == "" {
 			w.WriteHeader(http.StatusNotFound)
 
-			var errorResponse = ErrorResponse{
+			writer.Encode(data.ErrorResponse{
 				Error:   404,
 				Message: "The key is missing!",
-			}
-			json.NewEncoder(w).Encode(errorResponse)
+			})
+
 			return
 		}
 
@@ -55,52 +32,51 @@ func saveData(w http.ResponseWriter, r *http.Request) {
 		if value == "" {
 			w.WriteHeader(http.StatusNotFound)
 
-			var errorResponse = ErrorResponse{
+			writer.Encode(data.ErrorResponse{
 				Error:   404,
 				Message: "The value is missing!",
-			}
-			json.NewEncoder(w).Encode(errorResponse)
-			return
-		}
+			})
 
-		var data = Data{
-			Key:   key,
-			Value: value,
+			return
 		}
 
 		if os.Getenv(SOURCE+key) == "" {
 			os.Setenv(SOURCE+key, value)
-			json.NewEncoder(w).Encode(data)
+
+			writer.Encode(data.Data{
+				Key:   key,
+				Value: value,
+			})
+
 			return
 		} else {
 			w.WriteHeader(http.StatusBadRequest)
 
-			var error = ErrorResponse{
+			writer.Encode(data.ErrorResponse{
 				Error:   400,
 				Message: "The value already exist!",
-			}
+			})
 
-			json.NewEncoder(w).Encode(error)
 			return
 		}
 
 	} else {
 		w.WriteHeader(http.StatusUnauthorized)
 
-		var error = ErrorResponse{
+		writer.Encode(data.ErrorResponse{
 			Error:   401,
 			Message: "Unauthorized!",
-		}
+		})
 
-		json.NewEncoder(w).Encode(error)
 		return
 	}
 }
 
-func getData(w http.ResponseWriter, r *http.Request) {
+func GetData(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
+	writer := json.NewEncoder(w)
 
-	if checkAuthorization(r.Header) {
+	if security.CheckAuthorization(r.Header) {
 		var key string = r.Header.Get("key")
 		var solidKey string = SOURCE + key
 
@@ -108,101 +84,107 @@ func getData(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusOK)
 			var value string = os.Getenv(solidKey)
 
-			var data = Data{
-				Key:   key,
-				Value: value,
+			if value != "" {
+				writer.Encode(data.Data{
+					Key:   key,
+					Value: value,
+				})
+
+				return
+			} else {
+				w.WriteHeader(http.StatusNotFound)
+
+				writer.Encode(data.ErrorResponse{
+					Error:   404,
+					Message: "The value doesn't exist!",
+				})
+				return
 			}
 
-			json.NewEncoder(w).Encode(data)
-			return
 		} else {
 			w.WriteHeader(http.StatusNotFound)
 
-			var errorResponse = ErrorResponse{
+			writer.Encode(data.ErrorResponse{
 				Error:   404,
 				Message: "The key is missing!",
-			}
-			json.NewEncoder(w).Encode(errorResponse)
+			})
+
 			return
 		}
 	} else {
 		w.WriteHeader(http.StatusUnauthorized)
 
-		var error = ErrorResponse{
+		writer.Encode(data.ErrorResponse{
 			Error:   401,
 			Message: "Unauthorized!",
-		}
+		})
 
-		json.NewEncoder(w).Encode(error)
 		return
 	}
 }
 
-func isValid(w http.ResponseWriter, r *http.Request) {
+func IsValid(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
+	writer := json.NewEncoder(w)
 
-	if checkAuthorization(r.Header) {
+	if security.CheckAuthorization(r.Header) {
 		var key string = r.Header.Get("key")
 
 		if key == "" {
 			w.WriteHeader(http.StatusNotFound)
 
-			var error = ErrorResponse{
+			writer.Encode(data.ErrorResponse{
 				Error:   404,
 				Message: "The key is missing!",
-			}
+			})
 
-			json.NewEncoder(w).Encode(error)
 			return
 		}
 
 		if os.Getenv(SOURCE+key) != "" {
 			w.WriteHeader(http.StatusOK)
 
-			var valid = Valid{
+			writer.Encode(data.Valid{
 				Ok: true,
-			}
+			})
 
-			json.NewEncoder(w).Encode(valid)
 			return
 		} else {
-			w.WriteHeader(http.StatusOK)
+			w.WriteHeader(http.StatusNotFound)
 
-			var valid = Valid{
+			writer.Encode(data.Valid{
 				Ok: false,
-			}
+			})
 
-			json.NewEncoder(w).Encode(valid)
 			return
 		}
 
 	} else {
 		w.WriteHeader(http.StatusUnauthorized)
 
-		var error = ErrorResponse{
+		writer.Encode(data.ErrorResponse{
 			Error:   401,
 			Message: "Unauthorized!",
-		}
+		})
 
-		json.NewEncoder(w).Encode(error)
 		return
 	}
 }
 
-func removeData(w http.ResponseWriter, r *http.Request) {
+func RemoveData(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
+	writer := json.NewEncoder(w)
 
-	if checkAuthorization(r.Header) {
+	if security.CheckAuthorization(r.Header) {
 		var requestKey string = r.Header.Get("key")
 		if requestKey == "" {
 			w.WriteHeader(http.StatusNotFound)
 
-			var error = ErrorResponse{
+			writer.Encode(data.ErrorResponse{
 				Error:   404,
 				Message: "The key is missing!",
-			}
+			})
 
-			json.NewEncoder(w).Encode(error)
 			return
 		} else {
 			var value string = os.Getenv(SOURCE + requestKey)
@@ -210,43 +192,33 @@ func removeData(w http.ResponseWriter, r *http.Request) {
 			if value != "" {
 				w.WriteHeader(http.StatusOK)
 
-				var data = Data{
-					Key:   requestKey,
-					Value: value,
-				}
-
 				os.Unsetenv(SOURCE + requestKey)
 
-				json.NewEncoder(w).Encode(data)
+				writer.Encode(data.Data{
+					Key:   requestKey,
+					Value: value,
+				})
+
 				return
 			} else {
 				w.WriteHeader(http.StatusNotFound)
 
-				var error = ErrorResponse{
+				writer.Encode(data.ErrorResponse{
 					Error:   404,
 					Message: "The data doesn't exist!",
-				}
+				})
 
-				json.NewEncoder(w).Encode(error)
 				return
 			}
 		}
 	} else {
 		w.WriteHeader(http.StatusUnauthorized)
 
-		var error = ErrorResponse{
+		writer.Encode(data.ErrorResponse{
 			Error:   401,
 			Message: "Unauthorized!",
-		}
+		})
 
-		json.NewEncoder(w).Encode(error)
 		return
 	}
-}
-
-func checkAuthorization(header http.Header) bool {
-	if header.Get("X-API-Key") == os.Getenv("API_KEY") {
-		return false
-	}
-	return true
 }
