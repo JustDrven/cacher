@@ -1,18 +1,11 @@
 package main
 
-import (
-	"cacher/api"
-	"cacher/security"
-	"log"
-	"net/http"
-)
+import "cacher/api"
 
 func main() {
-	http.HandleFunc("/v1/valid", security.AuthMiddleware(api.IsValid))
-	http.HandleFunc("/v1/get", security.AuthMiddleware(api.GetData))
-	http.HandleFunc("/v1/set", security.AuthMiddleware(api.SaveData))
-	http.HandleFunc("/v1/remove", security.AuthMiddleware(api.RemoveData))
+	app := api.App{
+		Addr: ":8080",
+	}
 
-	log.Println("The server is starting..")
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	api.StartAPI(app)
 }
