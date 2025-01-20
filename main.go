@@ -1,11 +1,10 @@
 package main
 
-import "cacher/api"
+import (
+	"cacher/api"
+	"cacher/app/settings"
+)
 
 func main() {
-	app := api.App{
-		Addr: ":8080",
-	}
-
-	api.StartAPI(app)
+	api.StartAPI(settings.App)
 }
