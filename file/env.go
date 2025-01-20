@@ -3,8 +3,25 @@ package file
 import (
 	"bufio"
 	"os"
+	"strconv"
 	"strings"
 )
+
+func GetEnvToBool(key string) bool {
+	var value = GetEnv(key)
+
+	if value == "" {
+		return false
+	}
+
+	boolValue, error := strconv.ParseBool(value)
+
+	if error != nil {
+		return false
+	}
+
+	return boolValue
+}
 
 func GetEnv(key string) string {
 	file, err := os.Open(".env")
