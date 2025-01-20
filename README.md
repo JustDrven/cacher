@@ -2,6 +2,12 @@
 
 Easy microservice for saving caches into memory
 
+### Installer
+
+Only send the command ``
+bash ./start.sh
+``
+
 ### Security
 
 This microservice uses API Key in request header
