@@ -2,12 +2,11 @@ package api
 
 import (
 	"cacher/data"
+	"cacher/utility"
 	"encoding/json"
 	"net/http"
 	"os"
 )
-
-var SOURCE = "CACHER:"
 
 func SaveData(w http.ResponseWriter, r *http.Request) {
 	writer := json.NewEncoder(w)
@@ -36,8 +35,8 @@ func SaveData(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if os.Getenv(SOURCE+key) == "" {
-		os.Setenv(SOURCE+key, value)
+	if os.Getenv(utility.SOURCE+key) == "" {
+		os.Setenv(utility.SOURCE+key, value)
 
 		writer.Encode(data.Data{
 			Key:   key,
@@ -62,7 +61,7 @@ func GetData(w http.ResponseWriter, r *http.Request) {
 	writer := json.NewEncoder(w)
 
 	var key string = r.Header.Get("key")
-	var solidKey string = SOURCE + key
+	var solidKey string = utility.SOURCE + key
 
 	if key != "" && solidKey != "" {
 		w.WriteHeader(http.StatusOK)
@@ -112,7 +111,7 @@ func IsValid(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if os.Getenv(SOURCE+key) != "" {
+	if os.Getenv(utility.SOURCE+key) != "" {
 		w.WriteHeader(http.StatusOK)
 
 		writer.Encode(data.Valid{
@@ -146,12 +145,12 @@ func RemoveData(w http.ResponseWriter, r *http.Request) {
 
 		return
 	} else {
-		var value string = os.Getenv(SOURCE + requestKey)
+		var value string = os.Getenv(utility.SOURCE + requestKey)
 
 		if value != "" {
 			w.WriteHeader(http.StatusOK)
 
-			os.Unsetenv(SOURCE + requestKey)
+			os.Unsetenv(utility.SOURCE + requestKey)
 
 			writer.Encode(data.Data{
 				Key:   requestKey,
