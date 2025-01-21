@@ -13,6 +13,7 @@ func StartAPI(app app.Application) {
 	http.HandleFunc("GET /v1/get", security.AuthMiddleware(GetData))
 	http.HandleFunc("POST /v1/set", security.AuthMiddleware(SaveData))
 	http.HandleFunc("DELETE /v1/remove", security.AuthMiddleware(RemoveData))
+	http.HandleFunc("POST /v1/replace", security.AuthMiddleware(ReplaceData))
 
 	http.HandleFunc("/", NotFound)
 
