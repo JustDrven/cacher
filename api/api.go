@@ -17,6 +17,8 @@ func StartAPI(app app.Application) {
 	manager.RegisterRouter("DELETE", "remove", RemoveData, true)
 	manager.RegisterRouter("POST", "replace", ReplaceData, true)
 
+	manager.RegisterRouter("GET", "ping", Ping, false)
+
 	log.Println("The server is starting at http://localhost" + app.Config.Addr + "..")
 	log.Println("Debug is " + strconv.FormatBool(app.Debug))
 
