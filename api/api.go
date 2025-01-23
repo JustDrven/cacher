@@ -15,7 +15,7 @@ func StartAPI(app app.Application) {
 	manager.RegisterRouter("GET", "get", GetData, true)
 	manager.RegisterRouter("POST", "set", SaveData, true)
 	manager.RegisterRouter("DELETE", "remove", RemoveData, true)
-	manager.RegisterRouter("POST", "replace", ReplaceData, true)
+	manager.RegisterRouter("PUT", "replace", ReplaceData, true)
 
 	manager.RegisterRouter("GET", "ping", Ping, false)
 
