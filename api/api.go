@@ -2,21 +2,18 @@ package api
 
 import (
 	"cacher/app"
-	"cacher/security"
-	"cacher/utility"
+	"cacher/manager"
 	"log"
 	"net/http"
 )
 
 func StartAPI(app app.Application) {
 
-	http.HandleFunc("GET "+utility.API_VERSION+"valid", security.AuthMiddleware(IsValid))
-	http.HandleFunc("GET "+utility.API_VERSION+"get", security.AuthMiddleware(GetData))
-	http.HandleFunc("POST "+utility.API_VERSION+"set", security.AuthMiddleware(SaveData))
-	http.HandleFunc("DELETE "+utility.API_VERSION+"remove", security.AuthMiddleware(RemoveData))
-	http.HandleFunc("POST "+utility.API_VERSION+"replace", security.AuthMiddleware(ReplaceData))
-
-	http.HandleFunc("/", NotFound)
+	manager.RegisterRouter("GET", "valid", IsValid, true)
+	manager.RegisterRouter("GET", "get", GetData, true)
+	manager.RegisterRouter("POST", "set", SaveData, true)
+	manager.RegisterRouter("DELETE", "remove", RemoveData, true)
+	manager.RegisterRouter("POST", "replace", ReplaceData, true)
 
 	log.Println("The server is starting at http://localhost" + app.Config.Addr + "..")
 	log.Fatal(http.ListenAndServe(app.Config.Addr, nil))
