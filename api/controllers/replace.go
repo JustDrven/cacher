@@ -47,8 +47,6 @@ func ReplaceData(w http.ResponseWriter, r *http.Request) {
 		writer.Encode(data.Valid{
 			Ok: true,
 		})
-
-		return
 	} else {
 		w.WriteHeader(http.StatusBadRequest)
 
@@ -57,8 +55,6 @@ func ReplaceData(w http.ResponseWriter, r *http.Request) {
 		writer.Encode(data.Valid{
 			Ok: false,
 		})
-
-		return
 	}
 
 }

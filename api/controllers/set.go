@@ -49,8 +49,6 @@ func SaveData(w http.ResponseWriter, r *http.Request) {
 			Key:   key,
 			Value: value,
 		})
-
-		return
 	} else {
 		w.WriteHeader(http.StatusBadRequest)
 
@@ -60,8 +58,6 @@ func SaveData(w http.ResponseWriter, r *http.Request) {
 			Error:   400,
 			Message: "The value already exist!",
 		})
-
-		return
 	}
 
 }

@@ -33,8 +33,6 @@ func IsValid(w http.ResponseWriter, r *http.Request) {
 		writer.Encode(data.Valid{
 			Ok: true,
 		})
-
-		return
 	} else {
 		w.WriteHeader(http.StatusNotFound)
 
@@ -43,8 +41,6 @@ func IsValid(w http.ResponseWriter, r *http.Request) {
 		writer.Encode(data.Valid{
 			Ok: false,
 		})
-
-		return
 	}
 
 }

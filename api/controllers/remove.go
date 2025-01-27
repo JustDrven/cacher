@@ -38,7 +38,6 @@ func RemoveData(w http.ResponseWriter, r *http.Request) {
 				Value: value,
 			})
 
-			return
 		} else {
 			w.WriteHeader(http.StatusNotFound)
 
@@ -48,8 +47,6 @@ func RemoveData(w http.ResponseWriter, r *http.Request) {
 				Error:   404,
 				Message: "The data doesn't exist!",
 			})
-
-			return
 		}
 	}
 }

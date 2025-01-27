@@ -25,8 +25,6 @@ func GetData(w http.ResponseWriter, r *http.Request) {
 				Key:   key,
 				Value: value,
 			})
-
-			return
 		} else {
 			w.WriteHeader(http.StatusNotFound)
 
@@ -36,9 +34,9 @@ func GetData(w http.ResponseWriter, r *http.Request) {
 				Error:   404,
 				Message: "The value doesn't exist!",
 			})
-			return
 		}
 
+		return
 	} else {
 		w.WriteHeader(http.StatusNotFound)
 
@@ -48,7 +46,5 @@ func GetData(w http.ResponseWriter, r *http.Request) {
 			Error:   404,
 			Message: "The key is missing!",
 		})
-
-		return
 	}
 }
