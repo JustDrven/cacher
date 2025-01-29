@@ -8,6 +8,6 @@ import (
 var App = v1.Application{
 	Debug: file.GetEnvToBool("DEBUG"),
 	Config: v1.ApplicationConfig{
-		Addr: ":8080",
+		Addr: ":" + file.GetEnv("API_PORT"),
 	},
 }
