@@ -6,8 +6,6 @@ Open-source micro-service written in GoLang. This micro-service saves values int
 
 Linux and macOS:
 
-<br>
-
 Use: ``
 bash ./start.sh
 ``
