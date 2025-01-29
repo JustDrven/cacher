@@ -4,7 +4,7 @@ Open-source micro-service written in GoLang. This micro-service saves values int
 
 ### Installer
 
-Linux and macOS:
+##### Linux and macOS:
 
 Use: ``
 bash ./start.sh
