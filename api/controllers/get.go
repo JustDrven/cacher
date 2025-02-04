@@ -2,21 +2,21 @@ package controllers
 
 import (
 	"cacher/factory"
+	"cacher/manager"
 	"cacher/utility"
 	"encoding/json"
 	"net/http"
-	"os"
 )
 
 func GetData(w http.ResponseWriter, r *http.Request) {
 	writer := json.NewEncoder(w)
 
 	var key string = r.Header.Get("key")
-	var solidKey string = utility.SOURCE + key
 
-	if key != "" && solidKey != "" {
+	var value, err = manager.Get(key)
+
+	if !err {
 		w.WriteHeader(http.StatusOK)
-		var value string = os.Getenv(solidKey)
 
 		if value != "" {
 			utility.SetETag("true", w)

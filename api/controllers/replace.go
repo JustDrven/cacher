@@ -2,10 +2,10 @@ package controllers
 
 import (
 	"cacher/factory"
+	"cacher/manager"
 	"cacher/utility"
 	"encoding/json"
 	"net/http"
-	"os"
 )
 
 func ReplaceData(w http.ResponseWriter, r *http.Request) {
@@ -33,8 +33,9 @@ func ReplaceData(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if os.Getenv(utility.SOURCE+key) != "" {
-		os.Setenv(utility.SOURCE+key, value)
+	if manager.Exist(key) {
+		manager.Remove(key)
+		manager.Set(key, value)
 
 		utility.SetETag("true", w)
 

@@ -2,10 +2,10 @@ package controllers
 
 import (
 	"cacher/factory"
+	"cacher/manager"
 	"cacher/utility"
 	"encoding/json"
 	"net/http"
-	"os"
 )
 
 func IsValid(w http.ResponseWriter, r *http.Request) {
@@ -22,7 +22,7 @@ func IsValid(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if os.Getenv(utility.SOURCE+key) != "" {
+	if manager.Exist(key) {
 		w.WriteHeader(http.StatusOK)
 
 		utility.SetETag("true", w)

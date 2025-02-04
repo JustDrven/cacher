@@ -2,10 +2,10 @@ package controllers
 
 import (
 	"cacher/factory"
+	"cacher/manager"
 	"cacher/utility"
 	"encoding/json"
 	"net/http"
-	"os"
 )
 
 func RemoveData(w http.ResponseWriter, r *http.Request) {
@@ -21,14 +21,14 @@ func RemoveData(w http.ResponseWriter, r *http.Request) {
 
 		return
 	} else {
-		var value string = os.Getenv(utility.SOURCE + requestKey)
+		var value, err = manager.Get(requestKey)
 
-		if value != "" {
+		if !err {
 			w.WriteHeader(http.StatusOK)
 
 			utility.SetETag("true", w)
 
-			os.Unsetenv(utility.SOURCE + requestKey)
+			manager.Remove(requestKey)
 
 			writer.Encode(factory.NewDataResponse(requestKey, value))
 

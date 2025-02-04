@@ -2,10 +2,10 @@ package controllers
 
 import (
 	"cacher/factory"
+	"cacher/manager"
 	"cacher/utility"
 	"encoding/json"
 	"net/http"
-	"os"
 )
 
 func SaveData(w http.ResponseWriter, r *http.Request) {
@@ -33,11 +33,11 @@ func SaveData(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if os.Getenv(utility.SOURCE+key) == "" {
+	if !manager.Exist(key) {
 
 		utility.SetETag("true", w)
 
-		os.Setenv(utility.SOURCE+key, value)
+		manager.Set(key, value)
 
 		writer.Encode(factory.NewDataResponse(key, value))
 	} else {
