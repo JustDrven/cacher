@@ -2,7 +2,7 @@ package security
 
 import (
 	"cacher/app/settings"
-	"cacher/data"
+	"cacher/factory"
 	"cacher/file"
 	"encoding/json"
 	"log"
@@ -31,10 +31,7 @@ func AuthMiddleware(next http.HandlerFunc) http.HandlerFunc {
 		if !IsAPIKeyValid(r) {
 			w.WriteHeader(http.StatusUnauthorized)
 
-			json.NewEncoder(w).Encode(data.ErrorResponse{
-				Error:   401,
-				Message: "Unauthorized",
-			})
+			json.NewEncoder(w).Encode(factory.NewErrorResponse(401, "Unauthorized"))
 
 			return
 		}

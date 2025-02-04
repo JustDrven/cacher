@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	"cacher/data"
+	"cacher/factory"
 	"cacher/utility"
 	"encoding/json"
 	"net/http"
@@ -17,10 +17,7 @@ func SaveData(w http.ResponseWriter, r *http.Request) {
 
 		utility.SetETag("false", w)
 
-		writer.Encode(data.ErrorResponse{
-			Error:   404,
-			Message: "The key is missing!",
-		})
+		writer.Encode(factory.NewErrorResponse(404, "The key is missing!"))
 
 		return
 	}
@@ -31,10 +28,7 @@ func SaveData(w http.ResponseWriter, r *http.Request) {
 
 		utility.SetETag("false", w)
 
-		writer.Encode(data.ErrorResponse{
-			Error:   404,
-			Message: "The value is missing!",
-		})
+		writer.Encode(factory.NewErrorResponse(404, "The value is missing!"))
 
 		return
 	}
@@ -45,19 +39,14 @@ func SaveData(w http.ResponseWriter, r *http.Request) {
 
 		os.Setenv(utility.SOURCE+key, value)
 
-		writer.Encode(data.Data{
-			Key:   key,
-			Value: value,
-		})
+		writer.Encode(factory.NewDataResponse(key, value))
 	} else {
 		w.WriteHeader(http.StatusBadRequest)
 
 		utility.SetETag("false", w)
 
-		writer.Encode(data.ErrorResponse{
-			Error:   400,
-			Message: "The value already exist!",
-		})
+		writer.Encode(factory.NewErrorResponse(400, "The value already exist!"))
+
 	}
 
 }

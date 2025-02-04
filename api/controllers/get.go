@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	"cacher/data"
+	"cacher/factory"
 	"cacher/utility"
 	"encoding/json"
 	"net/http"
@@ -21,19 +21,13 @@ func GetData(w http.ResponseWriter, r *http.Request) {
 		if value != "" {
 			utility.SetETag("true", w)
 
-			writer.Encode(data.Data{
-				Key:   key,
-				Value: value,
-			})
+			writer.Encode(factory.NewDataResponse(key, value))
 		} else {
 			w.WriteHeader(http.StatusNotFound)
 
 			utility.SetETag("false", w)
 
-			writer.Encode(data.ErrorResponse{
-				Error:   404,
-				Message: "The value doesn't exist!",
-			})
+			writer.Encode(factory.NewErrorResponse(404, "The value doesn't exist!"))
 		}
 
 		return
@@ -42,9 +36,6 @@ func GetData(w http.ResponseWriter, r *http.Request) {
 
 		utility.SetETag("false", w)
 
-		writer.Encode(data.ErrorResponse{
-			Error:   404,
-			Message: "The key is missing!",
-		})
+		writer.Encode(factory.NewErrorResponse(404, "The key is missing!"))
 	}
 }

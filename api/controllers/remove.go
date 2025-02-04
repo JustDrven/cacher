@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	"cacher/data"
+	"cacher/factory"
 	"cacher/utility"
 	"encoding/json"
 	"net/http"
@@ -17,10 +17,7 @@ func RemoveData(w http.ResponseWriter, r *http.Request) {
 
 		utility.SetETag("false", w)
 
-		writer.Encode(data.ErrorResponse{
-			Error:   404,
-			Message: "The key is missing!",
-		})
+		writer.Encode(factory.NewErrorResponse(404, "The key is missing!"))
 
 		return
 	} else {
@@ -33,20 +30,14 @@ func RemoveData(w http.ResponseWriter, r *http.Request) {
 
 			os.Unsetenv(utility.SOURCE + requestKey)
 
-			writer.Encode(data.Data{
-				Key:   requestKey,
-				Value: value,
-			})
+			writer.Encode(factory.NewDataResponse(requestKey, value))
 
 		} else {
 			w.WriteHeader(http.StatusNotFound)
 
 			utility.SetETag("false", w)
 
-			writer.Encode(data.ErrorResponse{
-				Error:   404,
-				Message: "The data doesn't exist!",
-			})
+			writer.Encode(factory.NewErrorResponse(404, "The data doesn't exist!"))
 		}
 	}
 }

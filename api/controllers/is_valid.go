@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	"cacher/data"
+	"cacher/factory"
 	"cacher/utility"
 	"encoding/json"
 	"net/http"
@@ -17,10 +17,7 @@ func IsValid(w http.ResponseWriter, r *http.Request) {
 
 		utility.SetETag("false", w)
 
-		writer.Encode(data.ErrorResponse{
-			Error:   404,
-			Message: "The key is missing!",
-		})
+		writer.Encode(factory.NewErrorResponse(404, "The key is missing!"))
 
 		return
 	}
@@ -30,17 +27,13 @@ func IsValid(w http.ResponseWriter, r *http.Request) {
 
 		utility.SetETag("true", w)
 
-		writer.Encode(data.Valid{
-			Ok: true,
-		})
+		writer.Encode(factory.NewValidResponse(true))
 	} else {
 		w.WriteHeader(http.StatusNotFound)
 
 		utility.SetETag("false", w)
 
-		writer.Encode(data.Valid{
-			Ok: false,
-		})
+		writer.Encode(factory.NewValidResponse(false))
 	}
 
 }
