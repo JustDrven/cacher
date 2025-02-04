@@ -4,6 +4,7 @@ import (
 	"cacher/factory"
 	"cacher/manager"
 	"cacher/utility"
+	"cacher/utility/network"
 	"encoding/json"
 	"net/http"
 )
@@ -13,7 +14,7 @@ func RemoveData(w http.ResponseWriter, r *http.Request) {
 
 	var requestKey string = r.Header.Get("key")
 	if requestKey == "" {
-		w.WriteHeader(http.StatusNotFound)
+		network.NotFoundStatus(w)
 
 		utility.SetETag("false", w)
 
@@ -24,7 +25,7 @@ func RemoveData(w http.ResponseWriter, r *http.Request) {
 		var value, err = manager.Get(requestKey)
 
 		if !err {
-			w.WriteHeader(http.StatusOK)
+			network.OkStatus(w)
 
 			utility.SetETag("true", w)
 
@@ -33,7 +34,7 @@ func RemoveData(w http.ResponseWriter, r *http.Request) {
 			writer.Encode(factory.NewDataResponse(requestKey, value))
 
 		} else {
-			w.WriteHeader(http.StatusNotFound)
+			network.NotFoundStatus(w)
 
 			utility.SetETag("false", w)
 

@@ -4,6 +4,7 @@ import (
 	"cacher/app/settings"
 	"cacher/factory"
 	"cacher/file"
+	"cacher/utility/network"
 	"encoding/json"
 	"log"
 	"net/http"
@@ -29,7 +30,7 @@ func AuthMiddleware(next http.HandlerFunc) http.HandlerFunc {
 		w.Header().Set("Content-Type", "application/json")
 
 		if !IsAPIKeyValid(r) {
-			w.WriteHeader(http.StatusUnauthorized)
+			network.UnauthorizedStatus(w)
 
 			json.NewEncoder(w).Encode(factory.NewErrorResponse(401, "Unauthorized"))
 

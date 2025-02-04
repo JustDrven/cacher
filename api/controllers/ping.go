@@ -1,10 +1,14 @@
 package controllers
 
-import "net/http"
+import (
+	"cacher/utility/network"
+	"net/http"
+)
 
 func Ping(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/plain")
-	w.WriteHeader(http.StatusOK)
+
+	network.OkStatus(w)
 
 	w.Write([]byte("Pong!"))
 }

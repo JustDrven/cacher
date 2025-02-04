@@ -4,6 +4,7 @@ import (
 	"cacher/factory"
 	"cacher/manager"
 	"cacher/utility"
+	"cacher/utility/network"
 	"encoding/json"
 	"net/http"
 )
@@ -13,7 +14,7 @@ func SaveData(w http.ResponseWriter, r *http.Request) {
 
 	var key string = r.Header.Get("key")
 	if key == "" {
-		w.WriteHeader(http.StatusNotFound)
+		network.NotFoundStatus(w)
 
 		utility.SetETag("false", w)
 
@@ -24,7 +25,7 @@ func SaveData(w http.ResponseWriter, r *http.Request) {
 
 	var value string = r.Header.Get("value")
 	if value == "" {
-		w.WriteHeader(http.StatusNotFound)
+		network.NotFoundStatus(w)
 
 		utility.SetETag("false", w)
 
@@ -34,14 +35,14 @@ func SaveData(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if !manager.Exist(key) {
+		network.OkStatus(w)
 
 		utility.SetETag("true", w)
-
 		manager.Set(key, value)
 
 		writer.Encode(factory.NewDataResponse(key, value))
 	} else {
-		w.WriteHeader(http.StatusBadRequest)
+		network.BadRequestStatus(w)
 
 		utility.SetETag("false", w)
 

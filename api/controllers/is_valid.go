@@ -4,6 +4,7 @@ import (
 	"cacher/factory"
 	"cacher/manager"
 	"cacher/utility"
+	"cacher/utility/network"
 	"encoding/json"
 	"net/http"
 )
@@ -13,7 +14,7 @@ func IsValid(w http.ResponseWriter, r *http.Request) {
 	var key string = r.Header.Get("key")
 
 	if key == "" {
-		w.WriteHeader(http.StatusNotFound)
+		network.NotFoundStatus(w)
 
 		utility.SetETag("false", w)
 
@@ -23,13 +24,13 @@ func IsValid(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if manager.Exist(key) {
-		w.WriteHeader(http.StatusOK)
+		network.OkStatus(w)
 
 		utility.SetETag("true", w)
 
 		writer.Encode(factory.NewValidResponse(true))
 	} else {
-		w.WriteHeader(http.StatusNotFound)
+		network.NotFoundStatus(w)
 
 		utility.SetETag("false", w)
 
