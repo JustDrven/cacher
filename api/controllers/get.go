@@ -2,7 +2,7 @@ package controllers
 
 import (
 	"cacher/factory"
-	"cacher/manager"
+	"cacher/repository/storage"
 	"cacher/utility"
 	"cacher/utility/network"
 	"encoding/json"
@@ -14,7 +14,7 @@ func GetData(w http.ResponseWriter, r *http.Request) {
 
 	var key string = r.Header.Get("key")
 
-	var value, err = manager.Get(key)
+	var value, err = storage.Get(key)
 
 	if !err {
 		if value != "" {

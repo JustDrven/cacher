@@ -2,7 +2,7 @@ package controllers
 
 import (
 	"cacher/factory"
-	"cacher/manager"
+	"cacher/repository/storage"
 	"cacher/utility"
 	"cacher/utility/network"
 	"encoding/json"
@@ -34,11 +34,11 @@ func SaveData(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if !manager.Exist(key) {
+	if !storage.Exist(key) {
 		network.OkStatus(w)
 
 		utility.SetETag("true", w)
-		manager.Set(key, value)
+		storage.Set(key, value)
 
 		writer.Encode(factory.NewDataResponse(key, value))
 	} else {

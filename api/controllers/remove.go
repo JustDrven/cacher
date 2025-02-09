@@ -2,7 +2,7 @@ package controllers
 
 import (
 	"cacher/factory"
-	"cacher/manager"
+	"cacher/repository/storage"
 	"cacher/utility"
 	"cacher/utility/network"
 	"encoding/json"
@@ -22,14 +22,14 @@ func RemoveData(w http.ResponseWriter, r *http.Request) {
 
 		return
 	} else {
-		var value, err = manager.Get(requestKey)
+		var value, err = storage.Get(requestKey)
 
 		if !err {
 			network.OkStatus(w)
 
 			utility.SetETag("true", w)
 
-			manager.Remove(requestKey)
+			storage.Remove(requestKey)
 
 			writer.Encode(factory.NewDataResponse(requestKey, value))
 

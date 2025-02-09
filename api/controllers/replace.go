@@ -2,7 +2,7 @@ package controllers
 
 import (
 	"cacher/factory"
-	"cacher/manager"
+	"cacher/repository/storage"
 	"cacher/utility"
 	"cacher/utility/network"
 	"encoding/json"
@@ -34,11 +34,11 @@ func ReplaceData(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if manager.Exist(key) {
+	if storage.Exist(key) {
 		network.OkStatus(w)
 
-		manager.Remove(key)
-		manager.Set(key, value)
+		storage.Remove(key)
+		storage.Set(key, value)
 
 		utility.SetETag("true", w)
 
