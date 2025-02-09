@@ -1,4 +1,4 @@
-package manager
+package storage
 
 import (
 	"cacher/utility"
