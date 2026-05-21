@@ -42,5 +42,5 @@ func AuthMiddleware(next http.HandlerFunc) http.HandlerFunc {
 }
 
 func IsAPIKeyValid(r *http.Request) bool {
-	return r.Header.Get("X-API-Key") == API_KEY
+	return r.Header.Get("Authorization") == API_KEY
 }

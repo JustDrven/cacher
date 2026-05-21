@@ -2,14 +2,13 @@ package router
 
 import (
 	"cacher/internal/security"
-	"cacher/pkg"
 	"net/http"
 )
 
 func RegisterRouter(requestType string, path string, handler func(http.ResponseWriter, *http.Request), useMiddleware bool) {
 	if useMiddleware {
-		http.HandleFunc(requestType+" "+pkg.API_VERSION+path, security.AuthMiddleware(handler))
+		http.HandleFunc(requestType+" "+path, security.AuthMiddleware(handler))
 	} else {
-		http.HandleFunc(requestType+" "+pkg.API_VERSION+path, handler)
+		http.HandleFunc(requestType+" "+path, handler)
 	}
 }

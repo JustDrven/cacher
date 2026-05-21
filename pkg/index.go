@@ -6,8 +6,7 @@ import (
 )
 
 const (
-	SOURCE      string = "CACHER:"
-	API_VERSION string = "/v1/"
+	SOURCE string = "CACHER:"
 )
 
 func SetETag(data string, w http.ResponseWriter) {
