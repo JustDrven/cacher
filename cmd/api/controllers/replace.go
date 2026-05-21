@@ -1,10 +1,10 @@
 package controllers
 
 import (
-	"cacher/factory"
-	"cacher/repository/storage"
-	"cacher/utility"
-	"cacher/utility/network"
+	"cacher/internal/factory"
+	"cacher/internal/repository/storage"
+	"cacher/pkg"
+	"cacher/pkg/network"
 	"encoding/json"
 	"net/http"
 )
@@ -16,7 +16,7 @@ func ReplaceData(w http.ResponseWriter, r *http.Request) {
 	if key == "" {
 		network.NotFoundStatus(w)
 
-		utility.SetETag("false", w)
+		pkg.SetETag("false", w)
 
 		writer.Encode(factory.NewErrorResponse(404, "The key is missing!"))
 
@@ -27,7 +27,7 @@ func ReplaceData(w http.ResponseWriter, r *http.Request) {
 	if value == "" {
 		network.NotFoundStatus(w)
 
-		utility.SetETag("false", w)
+		pkg.SetETag("false", w)
 
 		writer.Encode(factory.NewErrorResponse(404, "The value is missing!"))
 
@@ -40,13 +40,13 @@ func ReplaceData(w http.ResponseWriter, r *http.Request) {
 		storage.Remove(key)
 		storage.Set(key, value)
 
-		utility.SetETag("true", w)
+		pkg.SetETag("true", w)
 
 		writer.Encode(factory.NewValidResponse(true))
 	} else {
 		network.BadRequestStatus(w)
 
-		utility.SetETag("false", w)
+		pkg.SetETag("false", w)
 
 		writer.Encode(factory.NewValidResponse(false))
 	}

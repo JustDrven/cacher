@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	"cacher/utility/network"
+	"cacher/pkg/network"
 	"net/http"
 )
 

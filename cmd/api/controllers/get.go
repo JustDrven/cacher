@@ -1,10 +1,10 @@
 package controllers
 
 import (
-	"cacher/factory"
-	"cacher/repository/storage"
-	"cacher/utility"
-	"cacher/utility/network"
+	"cacher/internal/factory"
+	"cacher/internal/repository/storage"
+	"cacher/pkg"
+	"cacher/pkg/network"
 	"encoding/json"
 	"net/http"
 )
@@ -20,13 +20,13 @@ func GetData(w http.ResponseWriter, r *http.Request) {
 		if value != "" {
 			network.OkStatus(w)
 
-			utility.SetETag("true", w)
+			pkg.SetETag("true", w)
 
 			writer.Encode(factory.NewDataResponse(key, value))
 		} else {
 			network.NotFoundStatus(w)
 
-			utility.SetETag("false", w)
+			pkg.SetETag("false", w)
 
 			writer.Encode(factory.NewErrorResponse(404, "The value doesn't exist!"))
 		}
@@ -35,7 +35,7 @@ func GetData(w http.ResponseWriter, r *http.Request) {
 	} else {
 		network.NotFoundStatus(w)
 
-		utility.SetETag("false", w)
+		pkg.SetETag("false", w)
 
 		writer.Encode(factory.NewErrorResponse(404, "The key is missing!"))
 	}

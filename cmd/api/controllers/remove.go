@@ -1,10 +1,10 @@
 package controllers
 
 import (
-	"cacher/factory"
-	"cacher/repository/storage"
-	"cacher/utility"
-	"cacher/utility/network"
+	"cacher/internal/factory"
+	"cacher/internal/repository/storage"
+	"cacher/pkg"
+	"cacher/pkg/network"
 	"encoding/json"
 	"net/http"
 )
@@ -16,7 +16,7 @@ func RemoveData(w http.ResponseWriter, r *http.Request) {
 	if requestKey == "" {
 		network.NotFoundStatus(w)
 
-		utility.SetETag("false", w)
+		pkg.SetETag("false", w)
 
 		writer.Encode(factory.NewErrorResponse(404, "The key is missing!"))
 
@@ -27,7 +27,7 @@ func RemoveData(w http.ResponseWriter, r *http.Request) {
 		if !err {
 			network.OkStatus(w)
 
-			utility.SetETag("true", w)
+			pkg.SetETag("true", w)
 
 			storage.Remove(requestKey)
 
@@ -36,7 +36,7 @@ func RemoveData(w http.ResponseWriter, r *http.Request) {
 		} else {
 			network.NotFoundStatus(w)
 
-			utility.SetETag("false", w)
+			pkg.SetETag("false", w)
 
 			writer.Encode(factory.NewErrorResponse(404, "The data doesn't exist!"))
 		}

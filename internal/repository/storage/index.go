@@ -1,11 +1,11 @@
 package storage
 
 import (
-	"cacher/utility"
+	"cacher/pkg"
 	"os"
 )
 
-const PREFIX string = utility.SOURCE
+const PREFIX string = pkg.SOURCE
 
 func Exist(key string) bool {
 	return os.Getenv(PREFIX+key) != ""

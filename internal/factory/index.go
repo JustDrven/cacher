@@ -1,6 +1,6 @@
 package factory
 
-import "cacher/data"
+import "cacher/internal/data"
 
 func NewErrorResponse(error int, msg string) data.ErrorResponse {
 	return data.ErrorResponse{

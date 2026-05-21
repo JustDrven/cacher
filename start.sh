@@ -1,6 +1,6 @@
 #!/bin/bash
 
 
-bash ./cmd/createFile.sh
+bash ./scripts/createFile.sh
 
 go run main.go

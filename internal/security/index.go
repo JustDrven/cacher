@@ -1,10 +1,10 @@
 package security
 
 import (
-	"cacher/app/settings"
-	"cacher/factory"
-	"cacher/file"
-	"cacher/utility/network"
+	"cacher/cmd/app/settings"
+	"cacher/internal/factory"
+	"cacher/internal/file"
+	"cacher/pkg/network"
 	"encoding/json"
 	"log"
 	"net/http"
@@ -36,6 +36,7 @@ func AuthMiddleware(next http.HandlerFunc) http.HandlerFunc {
 
 			return
 		}
+
 		next(w, r)
 	}
 }

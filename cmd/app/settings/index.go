@@ -1,13 +1,13 @@
 package settings
 
 import (
-	v1 "cacher/app"
-	"cacher/file"
+	"cacher/cmd/app"
+	"cacher/internal/file"
 )
 
-var App = v1.Application{
+var App = app.Application{
 	Debug: file.GetEnvToBool("DEBUG"),
-	Config: v1.ApplicationConfig{
+	Config: app.ApplicationConfig{
 		Addr: ":" + file.GetEnv("API_PORT"),
 	},
 }

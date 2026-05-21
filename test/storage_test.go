@@ -1,7 +1,7 @@
 package test
 
 import (
-	"cacher/repository/storage"
+	"cacher/internal/repository/storage"
 	"testing"
 )
 

@@ -1,8 +1,8 @@
 package main
 
 import (
-	"cacher/api"
-	"cacher/app/settings"
+	"cacher/cmd/api"
+	"cacher/cmd/app/settings"
 )
 
 func main() {
